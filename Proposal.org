@@ -4,7 +4,7 @@
 
 + Name: Sheng-Yi Hong
 + Email: sheng-yihong@acm.org
-+ Possible Mentor: Li-Wen Hsu
++ Possible Mentor: Li-Wen Hsu, Ed Maste
 + Github: https://github.com/aokblast
 
 ** Biography
@@ -73,6 +73,8 @@ The second step of test I will try to use the large kernel module like wifi to t
 
 *** Mid Term Evaluation
 
++ Finish LKM parse and LLDB Kernel Module implementation
+
 *** Week 7 ~ Week 8 ( July 17 ~ July 30 )
 
 + Find and parse symbol from static kernel module
@@ -88,3 +90,5 @@ The second step of test I will try to use the large kernel module like wifi to t
 + Final check and debug for our work
 
 *** End Term Evaluation
+
++ Finish both LKM and static kernel module for LLDB
