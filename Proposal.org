@@ -65,7 +65,7 @@ In the second stage of the test, I will post my work on reviews.freebsd.org to l
 *** Week 3 ~ Week 4 ( June 12 ~ July 26 )
 
 + Finish all tasks about kld
-+ Test and debug for the current support oㄈ kernel module
++ Test and debug for the current support of kernel module
 
 *** Week 5 ~ Week 6 ( June 26 ~ July 10 )
 
