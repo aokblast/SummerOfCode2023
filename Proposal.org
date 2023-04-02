@@ -9,11 +9,10 @@
 
 ** Biography
 
-Hello, I am Sheng-Yi Hong who is an undergraduating student study Department of Computer Science in National Taiwan Normal University (NTNU).
-I prefer and normally use C++ and Rust on school work and side project in my daily life.
-I am enthusiastic on both operating system and compiler and used to try to write my own kernel and put it on my github.
-Also, I got bronze medal in ICPC Taiwan Regional Contest last year which is a proof of ability of resolving problem.
-
+Hello, I am Sheng-Yi Hong, an undergraduate student in Department of Computer Science at the National Taiwan Normal University (NTNU).
+I prefer and usually use C++ and Rust on schoolwork and side projects in my daily life.
+I am enthusiastic about both operating systems and compilers and used to try to write my kernel and put it on my GitHub.
+Also, I got the bronze medal in ICPC Taiwan Regional Contest last year as proof of my capability to solve problems.
 
 * Project Information
 
@@ -21,40 +20,42 @@ Also, I got bronze medal in ICPC Taiwan Regional Contest last year which is a pr
 
 *** Introduction
 
-FreeBSD has replaced GNU toolchain with LLVM toolchain for a long time. In LLVM toolchain, their is a bundle debugger called lldb, which is also bundled in FreeBSD.
-The lldb debug facilities in userland has been well implemented for a long day. However, there are still some works need to be finished in the kernel space.
-What I want to do is to finish the kernel module information parse mechanism for kernel debugger.
+FreeBSD has replaced the GNU toolchain with the LLVM toolchain for a long time. In the LLVM toolchain, there is a bundle debugger called lldb, which is also bundled in FreeBSD.
+The lldb debug facilities in userland have been well implemented for a long time. However, there are some works still need to be done in the kernel space.
+What I want to do is to finish the parse mechanism about kernel module information for the kernel debugger.
 
 *** Methodology
 
-In kgdb's scheme, it do the following things:
+In kgdb's scheme, it does the following things:
 
-1. Setup the related structure offset in ./kern/linker.c and find the related linker_files structure which is a linked_list contains all of the loaded LKM information.
-2. Search the LKM from raw and absolute path to find the corresponding kernel module and get the table offset from bfd
+1. Setup the related structure offset in ./kern/linker.c and find the linker_files structure that is a linked_list containing all of the loaded LKM information.
+2. Search the LKM from the raw and absolute path to find the corresponding kernel module and get the table offset from bfd
 3. Relocating sections in ko files found in step 2 with LKM base address found in step 1
 4. Load symbol from symbol file and thus finish
 
-In LLDB's userspace, it read the kinfo_vmentry to get the loaded module information and thus can be found in GetLoadedModuleFileSpce method.
+In LLDB's userspace implementation, it read the kinfo_vmentry to get the loaded module information, and thus modules can be found in the GetLoadedModuleFileSpce method.
+
 What we have to do is to combine LLDB userspace and kgdb in LLDB kernel space.
 
-Except for the LKM, I also want to support static kernel module which is also a possible module type in FreeBSD kernel.
-But things are different is that static kernel module will not appear in kldstat. In other word, it will not appear in linker_files, so we need special handle of these files.
+Except for the LKM, I also want to support static kernel module which is also a possible module type in the FreeBSD kernel.
+But things are different in that the static kernel module will not appear in kldstat. In other words, it will not appear in linker_files, so we need a special handler on these files.
 
 *** Goal
 
-Let lldb has ability to read the kernel module information for both object and shared object and thus finally replace kgdb with lldb
+Let lldb has the ability to read the kernel module information for both object and shared object and thus finally replace kgdb with lldb
 
 *** Tests
 
-Through performace is not that importance for a debugger, I will focus the test on functionality.
-The first step of test I will try to write some small kernel module with some function symbol use as debug purpose.
-The second step of test I will try to use the large kernel module like wifi to test the functioanlity.
+Because performance is not that important for a debugger, I will focus the test on functionality.
+In the first stage of the test, I will try to write some small kernel modules with some function symbols contained for debug purposes.
+In the second stage of the test, I will try to use the large kernel module like wifi to test the functionality.
+In the second stage of the test, I will post my work on reviews.freebsd.org to let other module developers test it.
 
 ** Timeline
 
 *** May 4 ~ May 28 (Community Bonding Period):
 
-+ Fimiliar with LLVM and LLDB codebase
++ Familiar with LLVM and LLDB codebase
 + Make a biweekly report or blog post about LLVM and LLDB to my mentor
 
 *** Week 1 ~ Week 2 ( May 29 ~ June 12 )
@@ -64,7 +65,7 @@ The second step of test I will try to use the large kernel module like wifi to t
 *** Week 3 ~ Week 4 ( June 12 ~ July 26 )
 
 + Finish all tasks about kld
-+ Test and debug for the current support for kernel module
++ Test and debug for the current support oㄈ kernel module
 
 *** Week 5 ~ Week 6 ( June 26 ~ July 10 )
 
@@ -79,7 +80,7 @@ The second step of test I will try to use the large kernel module like wifi to t
 
 + Find and parse symbol from static kernel module
 + Unify static kernel module scheme with LKM and thus create a uniform kernel module parse tool
-  
+
 *** Week 8 ~ Week 9 ( July 31 ~ August 12 )
 
 + Add final support and check for static kernel module
