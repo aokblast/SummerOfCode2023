@@ -1,0 +1,90 @@
+#+TITLE: GSoC proposal
+
+* Personal Information
+
++ Name: Sheng-Yi Hong
++ Email: sheng-yihong@acm.org
++ Possible Mentor: Li-Wen Hsu
++ Github: https://github.com/aokblast
+
+** Biography
+
+Hello, I am Sheng-Yi Hong who is an undergraduating student study Department of Computer Science in National Taiwan Normal University (NTNU).
+I prefer and normally use C++ and Rust on school work and side project in my daily life.
+I am enthusiastic on both operating system and compiler and used to try to write my own kernel and put it on my github.
+Also, I got bronze medal in ICPC Taiwan Regional Contest last year which is a proof of ability of resolving problem.
+
+
+* Project Information
+
+** lldb kernel module debug functionality improvement
+
+*** Introduction
+
+FreeBSD has replaced GNU toolchain with LLVM toolchain for a long time. In LLVM toolchain, their is a bundle debugger called lldb, which is also bundled in FreeBSD.
+The lldb debug facilities in userland has been well implemented for a long day. However, there are still some works need to be finished in the kernel space.
+What I want to do is to finish the kernel module information parse mechanism for kernel debugger.
+
+*** Methodology
+
+In kgdb's scheme, it do the following things:
+
+1. Setup the related structure offset in ./kern/linker.c and find the related linker_files structure which is a linked_list contains all of the loaded LKM information.
+2. Search the LKM from raw and absolute path to find the corresponding kernel module and get the table offset from bfd
+3. Relocating sections in ko files found in step 2 with LKM base address found in step 1
+4. Load symbol from symbol file and thus finish
+
+In LLDB's userspace, it read the kinfo_vmentry to get the loaded module information and thus can be found in GetLoadedModuleFileSpce method.
+What we have to do is to combine LLDB userspace and kgdb in LLDB kernel space.
+
+Except for the LKM, I also want to support static kernel module which is also a possible module type in FreeBSD kernel.
+But things are different is that static kernel module will not appear in kldstat. In other word, it will not appear in linker_files, so we need special handle of these files.
+
+*** Goal
+
+Let lldb has ability to read the kernel module information for both object and shared object and thus finally replace kgdb with lldb
+
+*** Tests
+
+Through performace is not that importance for a debugger, I will focus the test on functionality.
+The first step of test I will try to write some small kernel module with some function symbol use as debug purpose.
+The second step of test I will try to use the large kernel module like wifi to test the functioanlity.
+
+** Timeline
+
+*** May 4 ~ May 28 (Community Bonding Period):
+
++ Fimiliar with LLVM and LLDB codebase
++ Make a biweekly report or blog post about LLVM and LLDB to my mentor
+
+*** Week 1 ~ Week 2 ( May 29 ~ June 12 )
+
++ Parse kld structure and design extraction interface for LKM file
+
+*** Week 3 ~ Week 4 ( June 12 ~ July 26 )
+
++ Finish all tasks about kld
++ Test and debug for the current support for kernel module
+
+*** Week 5 ~ Week 6 ( June 26 ~ July 10 )
+
++ Create LLDB Interface for LKM
++ Buffer for any possible delay
+
+*** Mid Term Evaluation
+
+*** Week 7 ~ Week 8 ( July 17 ~ July 30 )
+
++ Find and parse symbol from static kernel module
++ Unify static kernel module scheme with LKM and thus create a uniform kernel module parse tool
+  
+*** Week 8 ~ Week 9 ( July 31 ~ August 12 )
+
++ Add final support and check for static kernel module
+
+*** Week 10 ( August 13 ~ August 21 )
+
++ Buffer for any possible delay
++ Final check and debug for our work
+
+*** End Term Evaluation
