@@ -1,0 +1,87 @@
+diff --git a/contrib/llvm-project/FREEBSD-Xlist b/contrib/llvm-project/FREEBSD-Xlist
+index 8ba4fcc333b..416a3a3c935 100644
+--- a/contrib/llvm-project/FREEBSD-Xlist
++++ b/contrib/llvm-project/FREEBSD-Xlist
+@@ -1,4 +1,4 @@
+-.arcconfig
++7.arcconfig
+ .arclint
+ .clang-format
+ .clang-tidy
+@@ -344,6 +344,7 @@ lldb/source/Plugins/Disassembler/CMakeLists.txt
+ lldb/source/Plugins/Disassembler/LLVMC/CMakeLists.txt
+ lldb/source/Plugins/DynamicLoader/CMakeLists.txt
+ lldb/source/Plugins/DynamicLoader/Darwin-Kernel/
++lldb/source/Plugins/DynamicLoader/FreeBSD-Kernel/CMakeLists.txt
+ lldb/source/Plugins/DynamicLoader/Hexagon-DYLD/CMakeLists.txt
+ lldb/source/Plugins/DynamicLoader/MacOSX-DYLD/
+ lldb/source/Plugins/DynamicLoader/POSIX-DYLD/CMakeLists.txt
+diff --git a/contrib/llvm-project/lldb/source/Plugins/Process/FreeBSDKernel/ProcessFreeBSDKernel.cpp b/contrib/llvm-project/lldb/source/Plugins/Process/FreeBSDKernel/ProcessFreeBSDKernel.cpp
+index 30eace1ba94..1b29c75ccc4 100644
+--- a/contrib/llvm-project/lldb/source/Plugins/Process/FreeBSDKernel/ProcessFreeBSDKernel.cpp
++++ b/contrib/llvm-project/lldb/source/Plugins/Process/FreeBSDKernel/ProcessFreeBSDKernel.cpp
+@@ -9,8 +9,9 @@
+ #include "lldb/Core/Module.h"
+ #include "lldb/Core/PluginManager.h"
+ #include "lldb/Target/DynamicLoader.h"
++#include "lldb/Utility/LLDBLog.h"
+ 
+-#include "Plugins/DynamicLoader/Static/DynamicLoaderStatic.h"
++#include "Plugins/DynamicLoader/FreeBSD-Kernel/DynamicLoaderFreeBSDKernel.h"
+ #include "ProcessFreeBSDKernel.h"
+ #include "ThreadFreeBSDKernel.h"
+ 
+@@ -74,6 +75,10 @@ lldb::ProcessSP ProcessFreeBSDKernel::CreateInstance(lldb::TargetSP target_sp,
+                                                      ListenerSP listener_sp,
+                                                      const FileSpec *crash_file,
+                                                      bool can_connect) {
++    Log *log = GetLog(LLDBLog::Process);
++    LLDB_LOGF(log,
++              "ProcessFreeBSDKernel::Create Instance:"
++        "Try to create Instance");
+   ModuleSP executable = target_sp->GetExecutableModule();
+   if (crash_file && !can_connect && executable) {
+ #if LLDB_ENABLE_FBSDVMCORE
+@@ -94,6 +99,10 @@ lldb::ProcessSP ProcessFreeBSDKernel::CreateInstance(lldb::TargetSP target_sp,
+                                                        kvm);
+ #endif
+   }
++    LLDB_LOGF(log,
++              "ProcessFreeBSDKernel::Create Instance:"
++        "Create Instance failed");
++
+   return nullptr;
+ }
+ 
+@@ -261,13 +270,16 @@ bool ProcessFreeBSDKernel::DoUpdateThreadList(ThreadList &old_thread_list,
+ 
+ Status ProcessFreeBSDKernel::DoLoadCore() {
+   // The core is already loaded by CreateInstance().
++  DynamicLoader *dyld = GetDynamicLoader();
++  if (dyld)
++      dyld->DidLaunch();
+   return Status();
+ }
+ 
+ DynamicLoader *ProcessFreeBSDKernel::GetDynamicLoader() {
+   if (m_dyld_up.get() == nullptr)
+     m_dyld_up.reset(DynamicLoader::FindPlugin(
+-        this, DynamicLoaderStatic::GetPluginNameStatic()));
++        this, DynamicLoaderFreeBSDKernel::GetPluginNameStatic()));
+   return m_dyld_up.get();
+ }
+ 
+diff --git a/lib/clang/liblldb/Makefile b/lib/clang/liblldb/Makefile
+index e5590ff1e53..60549190875 100644
+--- a/lib/clang/liblldb/Makefile
++++ b/lib/clang/liblldb/Makefile
+@@ -337,7 +337,8 @@ SRCS+=		Plugins/Architecture/PPC64/ArchitecturePPC64.cpp
+ SRCS+=		Plugins/Disassembler/LLVMC/DisassemblerLLVMC.cpp
+ SRCS+=		Plugins/DynamicLoader/POSIX-DYLD/DYLDRendezvous.cpp
+ SRCS+=		Plugins/DynamicLoader/POSIX-DYLD/DynamicLoaderPOSIXDYLD.cpp
+-SRCS+=		Plugins/DynamicLoader/Static/DynamicLoaderStatic.cpp
++SRCS+=      Plugins/DynamicLoader/Static/DynamicLoaderStatic.cpp
++SRCS+=		Plugins/DynamicLoader/FreeBSD-Kernel/DynamicLoaderFreeBSDKernel.cpp
+ SRCS+=		Plugins/ExpressionParser/Clang/ASTResultSynthesizer.cpp
+ SRCS+=		Plugins/ExpressionParser/Clang/ASTStructExtractor.cpp
+ SRCS+=		Plugins/ExpressionParser/Clang/ASTUtils.cpp
